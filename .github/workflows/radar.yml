@@ -1,0 +1,36 @@
+name: Radar de Roupas
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install requests
+
+      - name: Executar radar
+        run: python radar.py
+
+      - name: Salvar ofertas já encontradas
+        run: |
+          git config user.name "Radar Roupas"
+          git config user.email "radar@users.noreply.github.com"
+          git add ofertas_enviadas.json
+          git diff --cached --quiet || git commit -m "Atualizar ofertas encontradas"
+          git push
